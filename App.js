@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { StyleSheet, Text, View, Button, TextInput, ScrollView, } from 'react-native'
+import { StyleSheet, Text, View, Button, TextInput, ScrollView, FlatList} from 'react-native'
+import GoalItem from './components/GoalItem'
+import GoalInput from './components/GoalInput'
 
 export default function App() {
   const [enteredGoalText, setEnteredGoalText ] = useState('')
@@ -11,8 +13,18 @@ export default function App() {
 
   function addGoalHandler(){
     if(!enteredGoalText.length) return
-    setCourseGoals(prevVal => [...prevVal, enteredGoalText])
-    // console.log(courseGoals)
+    setCourseGoals(prevVal => [
+      ...prevVal, 
+      {
+        text: enteredGoalText,
+        id: Math.random().toString()
+      },
+    ])
+    setEnteredGoalText('')
+  }
+
+  function removeAllGoal(){
+    setCourseGoals([])
   }
 
   const templateGoals = courseGoals.map(goal =>
@@ -23,19 +35,32 @@ export default function App() {
     ) 
   )
 
-  console.log("templateGoals", templateGoals)
-
   return (
     <View style={styles.appContainer}>
-      <View style={styles.inputContainer}>
-        <TextInput style={styles.textInput} placeholder="Your goal" onChangeText={goalInputHandler} />
-        <Button title='Add goal' onPress={addGoalHandler} />
+      <GoalInput 
+        onChangeEvent={goalInputHandler} 
+        value={enteredGoalText} 
+        onPressAddGoal={addGoalHandler} 
+      />
+      <View style={styles.wrapperRemoveBtn}>
+        <Button title="Remove all goal" onPress={removeAllGoal} />
       </View>
-      <Button title="Remove all goal" />
       <View style={styles.goalsContainer}>
-        <ScrollView alwaysBounceVertical={false} >
-          {templateGoals.length ? templateGoals : <Text> Your goal list is empty </Text>}
-        </ScrollView>
+        { courseGoals.length ?
+          <FlatList
+          data={courseGoals}
+          renderItem={ (itemData) => {
+            return (
+              <GoalItem text={itemData.item.text} />
+            )
+          }}
+          keyExtractor={(item, index) => {
+            return item.id
+          }}
+          alwaysBounceVertical={false} />
+          :
+          <Text> List is empry. Add your goal and view them here </Text>
+        }
       </View>
 
     </View>
@@ -48,35 +73,10 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 16,
   },
-  inputContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: '#cccc',
-  },
-  textInput: {
-    borderWidth: 1,
-    border: '#cccc',
-    padding: 8,
-    marginRight: 8,
-    borderRadius: 2,
-    width: '70%',
-  },
   goalsContainer: {
     flex: 4,
   },
-  goalItem: {
-    backgroundColor: 'pink',
-    padding: 16,
-    marginBottom: 10,
-    fontSize: 20,
-    fontWeight: 'bold',
-    borderRadius: 2,
-  },
-  goalText: {
-    color: "white",
+  wrapperRemoveBtn: {
+    marginBottom: 24,
   }
 });
