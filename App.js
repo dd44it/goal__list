@@ -27,6 +27,11 @@ export default function App() {
     setCourseGoals([])
   }
 
+  function deleteGoalHandler(id){
+    console.log(id)
+    setCourseGoals(prevVal => prevVal.filter(item => item.id !== id))
+  }
+
   const templateGoals = courseGoals.map(goal =>
     (
       <View style={styles.goalItem}>
@@ -51,7 +56,10 @@ export default function App() {
           data={courseGoals}
           renderItem={ (itemData) => {
             return (
-              <GoalItem text={itemData.item.text} />
+              <GoalItem 
+                text={itemData.item.text}
+                onDeleteItem={() => { deleteGoalHandler(itemData.item.id) } }
+              />
             )
           }}
           keyExtractor={(item, index) => {
@@ -59,7 +67,7 @@ export default function App() {
           }}
           alwaysBounceVertical={false} />
           :
-          <Text> List is empry. Add your goal and view them here </Text>
+          <Text> List is empty. Add your goal and view them here </Text>
         }
       </View>
 
