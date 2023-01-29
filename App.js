@@ -4,8 +4,13 @@ import GoalItem from './components/GoalItem'
 import GoalInput from './components/GoalInput'
 
 export default function App() {
+  const [modalIsVisible, setModalIsVisible] = useState(false)
   const [enteredGoalText, setEnteredGoalText ] = useState('')
   const [courseGoals, setCourseGoals] = useState([])
+
+  function startAddGoalHandler(){
+    setModalIsVisible(true)
+  }
  
   function goalInputHandler(enteredText){
     setEnteredGoalText(enteredText)
@@ -42,32 +47,43 @@ export default function App() {
 
   return (
     <View style={styles.appContainer}>
-      <GoalInput 
-        onChangeEvent={goalInputHandler} 
-        value={enteredGoalText} 
-        onPressAddGoal={addGoalHandler} 
+      <Button 
+        title='Add new goal' 
+        color="#5e0acc" 
+        onPress={startAddGoalHandler}
       />
-      <View style={styles.wrapperRemoveBtn}>
-        <Button title="Remove all goal" onPress={removeAllGoal} />
-      </View>
+      {
+        modalIsVisible &&
+        <View style={styles.wrapperRemoveBtn}>
+          <Button title="Remove all goal" onPress={removeAllGoal} />
+          <GoalInput 
+            onChangeEvent={goalInputHandler} 
+            value={enteredGoalText} 
+            onPressAddGoal={addGoalHandler} 
+            visible={modalIsVisible}
+          />
+        </View>
+
+      }
+
+
       <View style={styles.goalsContainer}>
-        { courseGoals.length ?
+        { courseGoals.length &&
           <FlatList
-          data={courseGoals}
-          renderItem={ (itemData) => {
-            return (
-              <GoalItem 
-                text={itemData.item.text}
-                onDeleteItem={() => { deleteGoalHandler(itemData.item.id) } }
-              />
-            )
-          }}
-          keyExtractor={(item, index) => {
-            return item.id
-          }}
-          alwaysBounceVertical={false} />
-          :
-          <Text> List is empty. Add your goal and view them here </Text>
+            data={courseGoals}
+            renderItem={ (itemData) => {
+              return (
+                <GoalItem 
+                  text={itemData.item.text}
+                  onDeleteItem={() => { deleteGoalHandler(itemData.item.id) } }
+                />
+              )
+            }}
+            keyExtractor={(item, index) => {
+              return item.id
+            }}
+            alwaysBounceVertical={false} 
+          />
         }
       </View>
 
