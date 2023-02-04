@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { StyleSheet, Text, View, Button, TextInput, ScrollView, FlatList} from 'react-native'
 import GoalItem from './components/GoalItem'
 import GoalInput from './components/GoalInput'
+import { StatusBar } from 'expo-status-bar'
 
 export default function App() {
   const [modalIsVisible, setModalIsVisible] = useState(false)
@@ -16,16 +17,18 @@ export default function App() {
     setEnteredGoalText(enteredText)
   }
 
+  function endAddGoalHandler(){
+    setModalIsVisible(false)
+  }
+
   function addGoalHandler(){
     if(!enteredGoalText.length) return
     setCourseGoals(prevVal => [
       ...prevVal, 
-      {
-        text: enteredGoalText,
-        id: Math.random().toString()
-      },
+      { text: enteredGoalText, id: Math.random().toString() },
     ])
     setEnteredGoalText('')
+    endAddGoalHandler()
   }
 
   function removeAllGoal(){
@@ -46,29 +49,37 @@ export default function App() {
   )
 
   return (
+    <>
+    <StatusBar style="light" />
     <View style={styles.appContainer}>
       <Button 
         title='Add new goal' 
-        color="#5e0acc" 
+        color="#a065ec" 
         onPress={startAddGoalHandler}
       />
+      { courseGoals.length 
+        ?
+          <View style={styles.wrapperRemoveBtn}>
+            <Button title="Remove all goal" onPress={removeAllGoal} />
+          </View>
+        : 
+          ''
+      }
+
       {
         modalIsVisible &&
-        <View style={styles.wrapperRemoveBtn}>
-          <Button title="Remove all goal" onPress={removeAllGoal} />
           <GoalInput 
             onChangeEvent={goalInputHandler} 
             value={enteredGoalText} 
             onPressAddGoal={addGoalHandler} 
             visible={modalIsVisible}
+            onCancel={endAddGoalHandler}
           />
-        </View>
-
       }
 
 
       <View style={styles.goalsContainer}>
-        { courseGoals.length &&
+        { 
           <FlatList
             data={courseGoals}
             renderItem={ (itemData) => {
@@ -88,6 +99,7 @@ export default function App() {
       </View>
 
     </View>
+    </>
   );
 }
 
@@ -96,11 +108,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 50,
     paddingHorizontal: 16,
+    backgroundColor: '#1e085a',
   },
   goalsContainer: {
     flex: 4,
   },
   wrapperRemoveBtn: {
-    marginBottom: 24,
+    marginBottom: 15,
+    marginTop: 15,
   }
 });
